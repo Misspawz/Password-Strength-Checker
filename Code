@@ -1,0 +1,65 @@
+import re
+import string
+
+def check_password_strength(password):
+    """Checks the strength of a password and provides feedback."""
+    strength = 0
+    feedback = []
+
+    # Basic criteria
+    if len(password) < 8:
+        feedback.append("Password should be at least 8 characters long.")
+    else:
+        strength += 1
+
+    has_upper = any(char.isupper() for char in password)
+    if has_upper:
+        strength += 1
+    else:
+        feedback.append("Password should contain at least one uppercase letter.")
+
+    has_lower = any(char.islower() for char in password)
+    if has_lower:
+        strength += 1
+    else:
+        feedback.append("Password should contain at least one lowercase letter.")
+
+    has_digit = any(char.isdigit() for char in password)
+    if has_digit:
+        strength += 1
+    else:
+        feedback.append("Password should contain at least one number.")
+
+    has_special = any(char not in string.ascii_letters + string.digits for char in password)
+    if has_special:
+        strength += 1
+    else:
+        feedback.append("Password should contain at least one special character.")
+
+    # Additional complexity checks
+    has_mixed_case = any(char.isupper() for char in password) and any(char.islower() for char in password)
+    if has_mixed_case:
+        strength += 1
+
+    has_consecutive = re.search(r'(.)\1{2,}', password) is None
+    if has_consecutive:
+        strength += 1
+
+    has_common_pattern = re.search(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[\w\d!@#$%^&*]{8,}$', password) is None
+    if not has_common_pattern:
+        strength += 1
+
+    if strength == 0:
+        return "Very weak password"
+    elif strength <= 2:
+        return "Weak password: " + ", ".join(feedback)
+    elif strength <= 4:
+        return "Medium password"
+    elif strength <= 6:
+        return "Strong password"
+    else:
+        return "Very strong password"
+
+password = input("Enter your password: ")
+result = check_password_strength(password)
+print(result)
